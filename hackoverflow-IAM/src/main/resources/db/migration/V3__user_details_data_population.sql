@@ -1,0 +1,1 @@
+INSERT INTO user_details(uuid,firstname,lastname,username,password,email,authority) VALUES('414afd18-0477-4a3e-87ba-b85440485c44','e','10','e10','$2a$10$01L/C7QcRiOYkAGoJUMq9uLcO4zrq8GZOa2JwR2ORhjKv/iIWR/gC','e10@gmail.com','Client');
