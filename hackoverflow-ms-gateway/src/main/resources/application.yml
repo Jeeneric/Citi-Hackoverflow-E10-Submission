@@ -1,0 +1,137 @@
+server:
+  port: 8081
+  error:
+    include-stacktrace: never
+
+ms:
+  iam:
+    uri: https://citi-ms-iam.herokuapp.com
+  accounts:
+    uri: https://hackoverflow-ms-accounts.herokuapp.com
+  gamify:
+    uri: https://hackoverflow-ms-gamify.herokuapp.com
+  knowledge:
+    uri: https://citi-ms-knowledge.herokuapp.com
+
+filters:
+  exclusions:
+    authn: /api/v1/account,/api/v1/login
+
+logging:
+  level:
+    reactor:
+      netty: INFO
+    org:
+      springframework:
+        cloud:
+          gateway: TRACE
+
+
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: register
+          uri: ${ms.iam.uri}
+          predicates:
+            - Path=/register/**
+          filters:
+            - RewritePath=/register,/api/v1/account
+        - id: login
+          uri: ${ms.iam.uri}
+          predicates:
+            - Path=/login/**
+          filters:
+            - RewritePath=/login,/api/v1/login
+        - id: account
+          uri: ${ms.accounts.uri}
+          predicates:
+            - Path=/account/**
+          filters:
+            - RewritePath=/account/(?<segment>.*), /api/v1/ms-accounts/account/$\{segment}
+        - id: transaction
+          uri: ${ms.accounts.uri}
+          predicates:
+            - Path=/transaction/**
+          filters:
+            - RewritePath=/transaction/(?<segment>.*), /api/v1/ms-accounts/transaction/$\{segment}
+        - id: transaction
+          uri: ${ms.accounts.uri}
+          predicates:
+            - Path=/destination/**
+          filters:
+            - RewritePath=/destination/(?<segment>.*), /api/v1/ms-accounts/destination/$\{segment}
+        - id: dashboard
+          uri: ${ms.accounts.uri}
+          predicates:
+            - Path=/dashboard/**
+          filters:
+            - RewritePath=/dashboard/(?<segment>.*), /api/v1/ms-accounts/dashboard/$\{segment}
+        - id: game-dashboard
+          uri: ${ms.gamify.uri}
+          predicates:
+            - Path=/game-dashboard/**
+          filters:
+            - RewritePath=/game-dashboard/(?<segment>.*), /api/v1/ms-gamify/game-dashboard/$\{segment}
+        - id: game-profile
+          uri: ${ms.gamify.uri}
+          predicates:
+            - Path=/game-profile/**
+          filters:
+            - RewritePath=/game-profile/(?<segment>.*), /api/v1/ms-gamify/game-profile/$\{segment}
+        - id: quest-completion
+          uri: ${ms.gamify.uri}
+          predicates:
+            - Path=/quest-completion/**
+          filters:
+            - RewritePath=/quest-completion/(?<segment>.*), /api/v1/ms-gamify/quest-completion/$\{segment}
+        - id: shop
+          uri: ${ms.gamify.uri}
+          predicates:
+            - Path=/shop/**
+          filters:
+            - RewritePath=/shop/(?<segment>.*), /api/v1/ms-gamify/shop/$\{segment}
+        - id: reward-wallet
+          uri: ${ms.gamify.uri}
+          predicates:
+            - Path=/reward-wallet/**
+          filters:
+            - RewritePath=/reward-wallet/(?<segment>.*), /api/v1/ms-gamify/reward-wallet/$\{segment}
+        - id: reward
+          uri: ${ms.gamify.uri}
+          predicates:
+            - Path=/reward/**
+          filters:
+            - RewritePath=/reward/(?<segment>.*), /api/v1/ms-gamify/reward/$\{segment}
+        - id: create-article
+          uri: ${ms.knowledge.uri}
+          predicates:
+            - Path=/create-article/**
+          filters:
+            - RewritePath=/create-article/(?<segment>.*), /api/v1/create-article/$\{segment}
+        - id: retrieve-article
+          uri: ${ms.knowledge.uri}
+          predicates:
+            - Path=/get-article/**
+          filters:
+            - RewritePath=/get-article/(?<segment>.*), /api/v1/get-article/$\{segment}
+        - id: retrieve-all-articles
+          uri: ${ms.knowledge.uri}
+          predicates:
+            - Path=/get-all-article/**
+          filters:
+            - RewritePath=/get-all-article/(?<segment>.*), /api/v1/get-all-article/$\{segment}
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins: "*"
+            allowed-methods: "*"
+            allowed-headers: "*"
+
+
+mvc:
+  pathmatch:
+    matching-strategy: ant_path_matcher
